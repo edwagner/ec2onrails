@@ -53,6 +53,7 @@ module Ec2onrails
       
       # make sure there's a manifest entry for each file
       Dir.glob("#{@dir}/**/*").each do |f|
+        next if File.directory?(f)
         f = normalize(f)
         unless self[f] || f == MANIFEST_FILE_NAME
           log_error "File isn't listed in manifest: #{f}"
