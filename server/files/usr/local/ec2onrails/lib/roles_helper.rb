@@ -131,7 +131,8 @@ module Ec2onrails
    
     # Process any ERB template under /etc
     # The output from "filename.erb" will be saved as "filename"
-    def process_config_file_templates
+    # Takes a Hash of other environment values that can be accessed from within the templates
+    def process_config_file_templates(env = {})
       # Set any variables that will be needed inside the templates
       # We're processing ALL templates, even ones that won't be used in the current role.
       rails_env = Ec2onrails::Utils.rails_env

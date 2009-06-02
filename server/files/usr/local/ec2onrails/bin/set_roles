@@ -24,13 +24,19 @@
 #    /etc/ec2onrails/nginx_upstream_members.erb
 
 
+require "rubygems"
+require "optiflag"
 require "#{File.dirname(__FILE__)}/../lib/roles_helper"
 include Ec2onrails::RolesHelper
+
+module CommandLineArgs extend OptiFlagSet
+  optional_switch_flag "ssl"
+  and_process!
+end
 
 puts "Roles: "
 pp roles
 
 resolve_hostnames_in_roles_file
 set_hostnames
-process_config_file_templates
-
+process_config_file_templates(:enable_ssl => ARGV.flags.ssl?)

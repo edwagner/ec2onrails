@@ -24,7 +24,7 @@ Capistrano::Configuration.instance(:must_exist).load do
           sudo "cp /tmp/roles.yml /etc/ec2onrails"
           #we want everyone to be able to read to it
           sudo "chmod a+r /etc/ec2onrails/roles.yml"
-          sudo "/usr/local/ec2onrails/bin/set_roles"
+          sudo "/usr/local/ec2onrails/bin/set_roles #{'--ssl' if cfg[:enable_ssl]}"
         end
       end
       
@@ -446,7 +446,12 @@ Capistrano::Configuration.instance(:must_exist).load do
           sessions.clear #clear out sessions cache..... this way the ssh connections are reinitialized
           
           # Remove the app user from the "rootequiv" group, this removes full sudo ability
-          run "deluser app rootequiv"
+          is_rootequiv = capture("groups").split.include?("rootequiv") # check groups before changing user
+          if is_rootequiv
+            run "deluser app rootequiv"
+          else
+            puts "User 'app' is not a member of group 'rootequiv' (old_user = #{old_user})."
+          end
         ensure
           set :user, old_user
           sessions.clear
