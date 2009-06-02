@@ -45,10 +45,10 @@ unless system "which rake"
   puts "Installing rake..."
   
   FileUtils.cd "/tmp" do
-    system "wget http://rubyforge.org/frs/download.php/29752/rake-0.8.1.tgz"
-    system "tar xvf rake-0.8.1.tgz"
+    system "wget http://rubyforge.org/frs/download.php/56872/rake-0.8.7.tgz"
+    system "tar xvf rake-0.8.7.tgz"
   end
-  FileUtils.cd "/tmp/rake-0.8.1" do
+  FileUtils.cd "/tmp/rake-0.8.7" do
     system "ruby install.rb"
   end
 end
