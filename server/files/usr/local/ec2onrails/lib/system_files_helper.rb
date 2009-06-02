@@ -45,10 +45,11 @@ module Ec2onrails
       
       FileUtils.cd from_dir do
         Dir.glob("**/*").each do |f|
-          unless File.directory?(f) || File.basename(f) == SystemFilesManifest::MANIFEST_FILE_NAME
+          unless File.basename(f) == SystemFilesManifest::MANIFEST_FILE_NAME ||
+              File.directory?(f) && !@manifest[f]
             dest = File.join("/", f)
             backup(dest)
-            make_dirs(dest)
+            make_dirs(File.directory?(f) ? dest : File.dirname(dest))
             install_file(f, dest, @manifest)
           end
         end
@@ -74,7 +75,7 @@ module Ec2onrails
     end
     
     def backup(f)
-      if File.exist?(f)
+      if File.exist?(f) && !File.directory?(f)
         puts "backing up file #{f}..."
         backup_file = f + BACKUP_FILE_EXT
         FileUtils.mv f, backup_file
@@ -89,22 +90,22 @@ module Ec2onrails
       end
     end
    
-    def make_dirs(f)
-      dir = File.dirname(f)
+    def make_dirs(dir)
       unless dir == "/"
         puts "making dirs #{dir}..."
-        FileUtils.mkdir_p File.dirname(f)
+        FileUtils.mkdir_p dir
       end
     end
     
     def install_file(f, dest, manifest)
-      puts "installing file #{f} into #{dest}..."
-      FileUtils.cp f, dest
-      if manifest
+      unless File.directory?(f)
+        puts "installing file #{f} into #{dest}..."
+        FileUtils.cp f, dest
+      end
+      if manifest && manifest[f]
         Utils.run "chown #{manifest[f][:owner]} #{dest}" if manifest[f][:owner]
         Utils.run "chmod #{manifest[f][:mode]} #{dest}" if manifest[f][:mode]
       end
     end
-    
   end
 end
