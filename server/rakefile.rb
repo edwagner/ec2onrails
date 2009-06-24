@@ -148,9 +148,9 @@ task :install_gems => [:require_root, :install_packages] do |t|
 end
 
 desc "Install nginx from source"
-task :install_nginx => [:require_root, :install_packages, :install_gems] do |t|
+task :install_nginx => [:require_root, :install_packages, :install_gems, :change_passenger_timeout] do |t|
   unless_completed(t) do
-    nginx_version = "nginx-0.6.36"
+    nginx_version = "nginx-0.6.37"
     nginx_tar = "#{nginx_version}.tar.gz"
 
     nginx_img = "http://sysoev.ru/nginx/#{nginx_tar}"
@@ -170,6 +170,27 @@ task :install_nginx => [:require_root, :install_packages, :install_gems] do |t|
          --add-module=`/usr/bin/passenger-config --root`/ext/nginx && \
        make && \
        make install'"
+  end
+end
+
+desc "Change the nginx / passenger upstream timeout"
+task :change_passenger_timeout => [:require_root, :install_packages, :install_gems] do |t|
+  unless_completed(t) do
+    run "sh -c 'cd #{@fs_dir}/usr/lib/ruby/gems/1.8/gems/passenger* && patch -p0 < #{File.dirname(__FILE__)}/patches/nginx-passenger-timeout.diff'"
+  end
+end
+
+desc "Install binary nginx and passenger"
+task :install_nginx_binary => [:require_root, :install_packages, :install_gems] do |t|
+  unless_completed(t) do
+    ENV['DEBIAN_FRONTEND'] = 'noninteractive'
+    ENV['LANG'] = ''
+    run_chroot "sh -c \"wget http://apt.brightbox.net/release.asc -O - | apt-key add -\""
+    run_chroot "sh -c \"wget -c http://apt.brightbox.net/sources/hardy/brightbox.list -P /etc/apt/sources.list.d/\""
+    run_chroot "sh -c \"wget -c http://apt.brightbox.net/sources/hardy/brightbox-testing.list -P /etc/apt/sources.list.d/\""
+    run_chroot "aptitude update"
+    run_chroot "aptitude install -y nginx-brightbox"
+    run_chroot "aptitude clean"
   end
 end
 

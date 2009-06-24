@@ -1,0 +1,27 @@
+--- ext/nginx/Configuration.c       2009-06-24 20:07:01.000000000 +0000
++++ ext/nginx/Configuration.c.new   2009-06-24 20:09:24.000000000 +0000
+@@ -951,10 +951,24 @@
+       ngx_conf_set_str_slot,
+       NGX_HTTP_LOC_CONF_OFFSET,
+       offsetof(passenger_loc_conf_t, environment),
+       NULL },
+ 
++    { ngx_string("scgi_send_timeout"),
++      NGX_HTTP_MAIN_CONF | NGX_HTTP_SRV_CONF | NGX_HTTP_LOC_CONF | NGX_CONF_TAKE1,
++      ngx_conf_set_msec_slot,
++      NGX_HTTP_LOC_CONF_OFFSET,
++      offsetof(passenger_loc_conf_t, upstream.send_timeout),
++      NULL },
++
++    { ngx_string("scgi_read_timeout"),
++      NGX_HTTP_MAIN_CONF | NGX_HTTP_SRV_CONF | NGX_HTTP_LOC_CONF | NGX_CONF_TAKE1,
++      ngx_conf_set_msec_slot,
++      NGX_HTTP_LOC_CONF_OFFSET,
++      offsetof(passenger_loc_conf_t, upstream.read_timeout),
++      NULL },
++
+ /*
+ 
+     { ngx_string("scgi_index"),
+       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
+       ngx_conf_set_str_slot,
