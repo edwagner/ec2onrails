@@ -173,7 +173,7 @@ task :install_nginx => [:require_root, :install_packages, :install_gems, :change
   end
 end
 
-desc "Change the nginx / passenger upstream timeout"
+desc "Alter the passenger source code to make the nginx upstream timeout configurable"
 task :change_passenger_timeout => [:require_root, :install_packages, :install_gems] do |t|
   unless_completed(t) do
     run "sh -c 'cd #{@fs_dir}/usr/lib/ruby/gems/1.8/gems/passenger* && patch -p0 < #{File.dirname(__FILE__)}/patches/nginx-passenger-timeout.diff'"
